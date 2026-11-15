@@ -1,24 +1,20 @@
-# Semester Week 10 Progress Report
+Что было сделано: Подготовлен план проекта AI Study Assistant («ИИ-помощник для учёбы»). Выбран уровень сложности C. Определены два инструмента для получения учебной информации,
+архитектура системы, способы тестирования и план работы до 17-й недели.
 
-## Completed Work
-Prepared a project proposal for AI Study Assistant, selected C level, defined two read-only tools, example questions, system architecture, validation strategy, and milestones for Weeks 10–17. This report describes the prepared deliverable, not independently verified historical activity during Nov 2–8.
+Коммиты: В прикреплённом файле указано, что история Git недоступна. 
+Но в твоём настоящем репозитории уже есть коммит b743202, относящийся к Week 10.
 
-## Important Commits
-- Commit hash: Not available — this ZIP has no Git history.
-- Description: Proposal and architecture documents prepared locally; a real commit is required in the student's fork.
-- Link: Not available until pushed to the student's fork.
+Текущая функциональность: На этом этапе готова документация и 
+структура будущего приложения.
 
-## Current Functionality
-Week 10 output is a complete written design and scope. Runnable prototype files are included separately as Week 11 work.
+Проблемы: ИИ может придумывать несуществующие сроки сдачи заданий. 
+Кроме того, слишком большой проект сложно завершить за семестр.
 
-## Problems Encountered
-A generic assistant could hallucinate academic deadlines; a broad project would also be difficult to validate within the semester.
+Решение: Использовать небольшой проверяемый набор учебных данных и 
+два инструмента, которые только читают информацию.
 
-## Solutions
-Use a small explicit sample catalog and two narrowly scoped, read-only tools with validated arguments and model-selected calls.
+Чему научился: Понял, что для уровня C недостаточно просто описать инструменты. 
+ИИ должен самостоятельно выбирать нужный инструмент, получать его результат и использовать его в ответе.
 
-## What I Learned
-C level requires the LLM to choose meaningful tools, execute them, receive actual results, and explain the answer. A diagram alone does not demonstrate this behavior.
-
-## Next Week
-Implement the API adapter, working CLI and tool loop, tests and setup documentation; verify locally and later with a real API key.
+План на следующую неделю: Создать работающий прототип, 
+подключить LLM API, реализовать инструменты и тесты.

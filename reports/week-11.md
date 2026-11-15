@@ -1,24 +1,20 @@
-# Semester Week 11 Progress Report
+Week 11 — Отчёт за 11-ю неделю
+Что было сделано: Разработан прототип AI Study Assistant на Node.js.
+Реализованы подключение к LLM через API, два инструмента для поиска учебной информации, проверка аргументов и автоматические тесты.
 
-## Completed Work
-Prepared a Node.js 22+ CLI prototype, OpenAI-compatible Chat Completions adapter, two local read-only tools, model-directed tool-call loop, argument validation, bounded rounds, and deterministic automated tests. The API adapter is implemented but live provider success is **not verified**.
+Коммиты: В прикреплённом файле написано, что история Git недоступна.
+Но в твоём репозитории уже есть коммит e3c8f9e, относящийся к Week 11.
 
-## Important Commits
-- Commit hash: Not available — the supplied ZIP is not a Git checkout.
-- Description: Prototype, tests and documentation prepared locally; meaningful commits must be made in the student's actual fork.
-- Link: Not available until pushed.
+Текущая функциональность: Пользователь задаёт вопрос, ИИ выбирает 
+подходящий инструмент, получает данные и формирует ответ.
 
-## Current Functionality
-The prototype can accept text, let a compatible LLM select tools, return local catalog results to the model, and print a final response. Mock-model tests cover these paths without credentials. Live operation requires the student's API key and a tool-calling model.
+Проблемы: В прикреплённом отчёте указано, что реальное подключение к API не проверено.
+Однако во время нашей работы ты уже успешно проверил реальный API-запрос. Поэтому этот пункт нужно обновить, чтобы отчёт соответствовал фактическим результатам.
 
-## Problems Encountered
-No API credentials or real GitHub history were provided. Provider/network behavior cannot be confirmed through offline tests.
+Решение: Использовать переменные окружения для API-ключа, 
+проверять аргументы инструментов и обрабатывать ошибки.
 
-## Solutions
-Use environment variables instead of hard-coded secrets, dependency injection for deterministic model tests, and explicit error messages for missing credentials, HTTP errors, invalid JSON and tool failures.
+Чему научился: Понял разницу между описанием инструмента для ИИ и 
+реальным выполнением функции. Также научился передавать результаты инструментов обратно модели.
 
-## What I Learned
-A tool schema informs the LLM, but a separate validated executor performs the actual lookup. Tool responses must be appended to conversation history, and the model must produce a final grounded answer. Tests using fake API responses do not prove live connectivity.
-
-## Next Week
-Add more user-friendly deadline summaries, stricter structured-output checks, more varied test cases and a documented live-provider smoke test when credentials are available.
+План на следующую неделю: Улучшить ответы о дедлайнах, расширить тесты и проверить надёжность работы приложения.

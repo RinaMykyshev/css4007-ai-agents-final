@@ -1,69 +1,129 @@
-# Project Proposal — Semester Week 10
+Предложение по проекту — 10-я неделя семестра
+Название проекта
+AI Study Assistant — ИИ-помощник для получения информации об учебных курсах и сроках сдачи заданий
+Описание проблемы
+Студентам часто приходится искать информацию о количестве кредитов по дисциплинам, сроках сдачи заданий и рекомендациях по обучению в разных источниках. Ручной поиск занимает время и может привести к пропуску важных заданий.
 
-## Project Title
-AI Study Assistant — Course Information and Deadline Agent
+В данном проекте разрабатывается прототип, использующий большую языковую модель (LLM) для понимания вопросов пользователя и самостоятельного выбора подходящего инструмента.
 
-## Problem Description
-Students often need to find course credits, assignment deadlines, and basic study guidance across separate sources. Searching manually wastes time and can lead to missed tasks. This prototype uses an LLM to interpret a question and select a relevant read-only tool. It uses a **small, fictional local course catalog**; it does not claim access to actual university records.
+Прототип работает с небольшим локальным каталогом вымышленных учебных дисциплин. Он не имеет доступа к реальным университетским базам данных и не заявляет о такой возможности.
+Целевая аудитория
+Основными пользователями системы являются:
+- Студенты университетов, которым необходим простой способ получения информации об учебных дисциплинах и сроках сдачи заданий с помощью естественного языка.
+- Преподаватели, демонстрирующие принципы безопасного использования инструментов языковыми моделями.
+Выбранный уровень сложности
+Уровень C — Intermediate (ИИ-агент, использующий инструменты).
 
-## Target Users
-University students who want simple natural-language access to sample course metadata and deadline information; instructors demonstrating safe LLM tool calling.
+На 11-й неделе планируется представить первую версию прототипа с интеграцией LLM. Полная реализация рабочего процесса уровня C запланирована к 13-й неделе.
+Ожидаемая функциональность
+Разрабатываемая система должна обладать следующими возможностями:
+1. Принимать вопросы пользователя на естественном языке через интерфейс командной строки (CLI).
+2. Предоставлять общие рекомендации по обучению без обращения к дополнительным инструментам.
+3. Самостоятельно выбирать между инструментами получения информации о дисциплинах и сроках сдачи заданий, используя языковую модель, а не поиск ключевых слов.
+4. Формировать ответы на основе данных локального каталога учебных дисциплин.
+5. Корректно сообщать об отсутствии дисциплины или ошибочных аргументах.
+6. Записывать информацию о выполнении инструментов без раскрытия конфиденциальных данных.
+7. Ограничивать количество циклов обращения к инструментам, предотвращая неконтролируемое выполнение.
+Предлагаемые функции
+1. complete(messages, tools, options)
+Назначение: получение ответа от языковой модели.
 
-## Selected Difficulty
-C — Intermediate (LLM tool-using agent). Week 11 delivers a first integration prototype; the complete C-level workflow is targeted for Week 13.
+Входные данные: история сообщений, описания инструментов и дополнительные настройки, включая возможность передачи пользовательской функции fetch и переменных окружения.
 
-## Expected Functionality
-- Accept natural-language questions through a command-line interface.
-- Provide general study advice without tool calls.
-- Select between course information and deadline tools using the model, not keyword routing.
-- Return answers grounded in the local course catalog.
-- Report missing courses and invalid tool arguments clearly.
-- Log observable tool execution without secrets.
-- Limit tool rounds to prevent uncontrolled execution.
+Результат: сообщение ассистента.
 
-## Proposed Functions
-- `complete(messages, tools, options)` — Purpose: request a model completion; input: chat messages, tool schemas, optional injected fetch/environment; output: assistant message; dependencies: configured OpenAI-compatible Chat Completions API, Node.js fetch.
-- `executeTool(name, args)` — Purpose: perform approved read-only catalog lookup; input: tool name and validated `{course_id}`; output: course metadata, deadlines, or a missing-course error; dependencies: `data/courses.json`.
-- `runAgent(input, options)` — Purpose: coordinate model-selected tools and final response; input: user text and optional model/logger; output: `{answer, trace}`; dependencies: model adapter and tool executor.
-- CLI entry `src/cli.mjs` — Purpose: run the assistant from terminal; input: quoted question; output: response and tool trace; dependencies: `runAgent`.
+Зависимости: API, совместимый с OpenAI Chat Completions, и встроенный fetch среды Node.js.
+2. executeTool(name, args)
+Назначение: выполнение разрешённого инструмента для получения информации из локального каталога.
 
-## Proposed Agent Tools
-1. `get_course_info(course_id: string)` — Exposes title and credits for an existing course; needed when the user asks about course metadata.
-2. `get_course_deadlines(course_id: string)` — Exposes recorded deadlines for a course; needed for scheduling and due-date questions.
-Both tools are read-only, have JSON schemas, and validate arguments at execution time. The model chooses the tool using native tool calling; it cannot access arbitrary files.
+Входные данные: название инструмента и проверенные аргументы {course_id}.
 
-## Model Selection
-OpenAI-compatible Chat Completions interface, configured with `LLM_MODEL`, `LLM_API_KEY`, and optionally `LLM_BASE_URL`. A suitable tool-calling model must be chosen by the student according to available provider access. No live API request has been verified during preparation; tests inject mock responses.
+Результат: информация о дисциплине, сроки сдачи заданий или сообщение об отсутствии дисциплины.
 
-## Architecture
-```text
-Student -> CLI -> runAgent -> LLM Chat Completions API
-                           |         |
-                           |    model-selected tool call
-                           v         v
-                       validate -> read-only course tools -> local JSON catalog
-                           |                           |
-                           +---- tool result -> LLM ---+
-                                         |
-                                    final answer
-```
-Execution is bounded to four model rounds, with a maximum of five tool calls per round. No external writes are allowed.
+Зависимости: файл data/courses.json.
+3. runAgent(input, options)
+Назначение: управление взаимодействием языковой модели с инструментами и формирование окончательного ответа.
 
-## Example Requests
-1. "How many credits is AI101?" (course information tool)
-2. "What deadlines are recorded for ML201?" (deadline tool)
-3. "How can I prepare for an exam?" (direct answer without tools)
-4. "When is CS999 due?" (missing-course handling)
+Входные данные: текст пользователя и необязательные настройки модели и журналирования.
 
-## Evaluation Plan
-Use Node's built-in test runner for unit and integration tests with deterministic fake model responses. Verify both tool outputs, unknown courses, argument validation, no-tool answers, LLM-selected tool execution, malformed calls, round limits, invalid input, and API failures. Run `npm test`, `npm run proposal`, `npm run report -- 10`, and `npm run report -- 11`. Test a live provider separately once credentials are configured; do not represent mock tests as a live integration.
+Результат: объект {answer, trace}, содержащий ответ и историю выполнения.
 
-## Weekly Milestones
-- Week 10 (Nov 2–8): scope, C-level choice, architecture, tool specifications, proposal.
-- Week 11 (Nov 9–15): Node environment, API adapter, CLI, first model-selected tool loop, mocked tests, setup documentation.
-- Week 12 (Nov 16–22): input/output schemas, richer study workflows, usability and tests.
-- Week 13 (Nov 23–29): live verification of two model-selected tools, logs, error recovery.
-- Week 14 (Nov 30–Dec 6): complete tool-calling workflow and demonstrations.
-- Week 15 (Dec 7–13): resilience, validation, more tests and failure scenarios.
-- Week 16 (Dec 14–20): evaluation on realistic questions, improvements, report.
-- Week 17 (Dec 21–22): final README, final report, demo, repository link and commit hash.
+Зависимости: модуль взаимодействия с моделью и исполнитель инструментов.
+4. src/cli.mjs
+Назначение: запуск ИИ-помощника через терминал.
+
+Входные данные: вопрос пользователя, переданный в кавычках.
+
+Результат: ответ системы и информация о вызванных инструментах.
+
+Зависимости: функция runAgent.
+Предлагаемые инструменты ИИ-агента
+1. get_course_info(course_id: string)
+Инструмент предназначен для получения названия дисциплины и количества академических кредитов.
+
+Используется, когда студент задаёт вопрос об общей информации по учебному курсу.
+2. get_course_deadlines(course_id: string)
+Инструмент предназначен для получения зарегистрированных сроков сдачи заданий по определённой дисциплине.
+
+Используется при вопросах о дедлайнах и планировании учебных задач.
+
+Оба инструмента работают исключительно в режиме чтения, имеют JSON-схемы и проверяют аргументы во время выполнения.
+
+Важно: языковая модель самостоятельно выбирает нужный инструмент через механизм tool calling. При этом она не получает произвольного доступа к файлам компьютера.
+Выбор языковой модели
+Для проекта используется интерфейс API, совместимый с OpenAI Chat Completions.
+
+Настройка выполняется через переменные окружения:
+- LLM_MODEL — название используемой языковой модели.
+- LLM_API_KEY — API-ключ для подключения.
+- LLM_BASE_URL — необязательный адрес API-сервера.
+Студент должен самостоятельно выбрать модель, поддерживающую вызов инструментов, с учётом доступного провайдера.
+
+На этапе подготовки документа реальный запрос к API не был подтверждён. Для автоматических тестов использовались имитированные ответы языковой модели (mock responses).
+
+Архитектура такая:
+![img.png]
+
+Выполнение ограничено четырьмя циклами обращения к языковой модели. В каждом цикле допускается не более пяти вызовов инструментов.
+
+Запись данных во внешние системы запрещена.
+Примеры запросов
+Вопрос пользователя	Действие системы
+«Сколько кредитов у AI101?»	Вызов инструмента информации о дисциплине
+«Какие дедлайны установлены для ML201?»	Вызов инструмента сроков сдачи
+«Как подготовиться к экзамену?»	Прямой ответ языковой модели без инструментов
+«Когда нужно сдать CS999?»	Обработка отсутствующей дисциплины
+
+План тестирования и оценки
+Для проверки системы планируется использовать встроенный тестовый модуль Node.js.
+
+Автоматические тесты будут применять заранее подготовленные ответы модели, обеспечивающие воспроизводимость результатов.
+
+Проверка включает:
+- Корректность результатов обоих инструментов.
+- Обработку неизвестных дисциплин и неправильных аргументов.
+- Ответы без использования инструментов.
+- Самостоятельный выбор и выполнение инструментов языковой моделью.
+- Обработку некорректных вызовов и ошибок API.
+- Ограничение количества циклов выполнения.
+- Проверку некорректного пользовательского ввода.
+Для запуска проверок предусмотрены следующие команды:
+npm test
+npm run proposal
+npm run report -- 10
+npm run report -- 11
+
+
+После настройки API-ключа необходимо отдельно проверить подключение к реальной языковой модели.
+
+Результаты тестов с имитированными ответами нельзя представлять как подтверждение успешной интеграции с реальным API.
+План работы по неделям
+Неделя	Период	Планируемые работы
+Week 10	2–8 ноября	Определение идеи проекта, выбор уровня C, разработка архитектуры, описание инструментов и подготовка предложения
+Week 11	9–15 ноября	Настройка Node.js, создание API-модуля, CLI, первого механизма вызова инструментов, тестов и документации
+Week 12	16–22 ноября	Разработка схем входных и выходных данных, улучшение учебных сценариев, удобства использования и тестов
+Week 13	23–29 ноября	Проверка работы двух инструментов с реальной языковой моделью, журналирование и обработка ошибок
+Week 14	30 ноября – 6 декабря	Завершение механизма вызова инструментов и подготовка демонстраций
+Week 15	7–13 декабря	Повышение надёжности, проверка аргументов, дополнительные тесты и моделирование ошибок
+Week 16	14–20 декабря	Оценка работы на реалистичных вопросах, улучшение системы и подготовка отчёта
+Week 17	21–22 декабря	Завершение README, итогового отчёта и демонстрации, предоставление ссылки на репозиторий и хеша коммита
