@@ -1,0 +1,5 @@
+{
+  "AI101": {"title":"Artificial Intelligence", "credits":5, "deadlines":[{"task":"Quiz 2", "date":"2026-11-20"},{"task":"Final project", "date":"2026-12-15"}]},
+  "ML201": {"title":"Machine Learning", "credits":6, "deadlines":[{"task":"Lab report", "date":"2026-11-25"},{"task":"Final exam", "date":"2026-12-18"}]},
+  "CS210": {"title":"Data Structures", "credits":5, "deadlines":[{"task":"Assignment 4", "date":"2026-11-27"}]}
+}
